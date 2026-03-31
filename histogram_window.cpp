@@ -1,8 +1,8 @@
 #include "histogram_window.h"
 #include "image_data.h"
+#include "app.h"
 #include <iostream>
 #include <cmath>
-#include <algorithm>
 #include <cstdio>
 
 // ─────────────────────────────────────────────────────────────
@@ -10,18 +10,13 @@
 // ─────────────────────────────────────────────────────────────
 static constexpr int PADDING        = 16;
 static constexpr int TITLE_H        = 28;
-
 static constexpr int HIST_TOP       = PADDING + TITLE_H;
 static constexpr int HIST_HEIGHT    = 180;
 static constexpr int HIST_BOTTOM    = HIST_TOP + HIST_HEIGHT;
-
-static constexpr int AXIS_LABEL_H   = 18;   // altura da linha de rótulos do eixo X
-
+static constexpr int AXIS_LABEL_H   = 18;
 static constexpr int DIVIDER_Y      = HIST_BOTTOM + AXIS_LABEL_H + 10;
-
 static constexpr int INFO_TOP       = DIVIDER_Y + 12;
 static constexpr int LINE_H         = 22;
-
 static constexpr int BTN_H          = 40;
 static constexpr int BTN_MARGIN     = 16;
 
@@ -29,8 +24,9 @@ static constexpr int BTN_MARGIN     = 16;
 // Construtor / Destrutor
 // ─────────────────────────────────────────────────────────────
 HistogramWindow::HistogramWindow(SDL_Window* parent, int x, int y,
-                                 int w, int h, ImageData* data)
-    : m_parent(parent), m_x(x), m_y(y), m_w(w), m_h(h), m_data(data)
+                                 int w, int h, ImageData* data, App* app)
+    : m_parent(parent), m_x(x), m_y(y), m_w(w), m_h(h),
+      m_data(data), m_app(app)
 {
     m_btnRect = {
         (float)BTN_MARGIN,
@@ -41,9 +37,9 @@ HistogramWindow::HistogramWindow(SDL_Window* parent, int x, int y,
 }
 
 HistogramWindow::~HistogramWindow() {
-    if (m_font)     { TTF_CloseFont(m_font);          m_font     = nullptr; }
-    if (m_renderer) { SDL_DestroyRenderer(m_renderer); m_renderer = nullptr; }
-    if (m_window)   { SDL_DestroyWindow(m_window);    m_window   = nullptr; }
+    if (m_font)     { TTF_CloseFont(m_font);           m_font     = nullptr; }
+    if (m_renderer) { SDL_DestroyRenderer(m_renderer);  m_renderer = nullptr; }
+    if (m_window)   { SDL_DestroyWindow(m_window);     m_window   = nullptr; }
     TTF_Quit();
 }
 
@@ -86,26 +82,30 @@ bool HistogramWindow::init() {
         if (m_font) break;
     }
     if (!m_font)
-        std::cerr << "Aviso: fonte nao carregada — textos nao serao exibidos.\n";
+        std::cerr << "Aviso: fonte nao carregada.\n";
 
     return true;
 }
 
 // ─────────────────────────────────────────────────────────────
-// refreshHistogram — chamado pelo Membro 4 após equalizar/reverter
+// refreshHistogram — atualiza exibição após equalizar/reverter
 // ─────────────────────────────────────────────────────────────
 void HistogramWindow::refreshHistogram() {
-    // Nada a fazer além de redesenhar no próximo render()
-    // (m_data já foi atualizado pelo ImageData internamente)
+    // Redesenha no próximo render() — m_data já foi atualizado
+    // Também notifica a janela principal para trocar a textura
+    if (m_app) {
+        m_app->updateMainTexture(m_data->getCurrentSurface());
+    }
 }
 
 // ─────────────────────────────────────────────────────────────
-// handleEvent
+// handleEvent — processa clique no botão equalizar/reverter
 // ─────────────────────────────────────────────────────────────
 void HistogramWindow::handleEvent(const SDL_Event& e) {
     if (!m_window) return;
     SDL_WindowID myID = SDL_GetWindowID(m_window);
 
+    // ── Hover ────────────────────────────────
     if (e.type == SDL_EVENT_MOUSE_MOTION && e.motion.windowID == myID) {
         float mx = e.motion.x, my = e.motion.y;
         bool over = mx >= m_btnRect.x && mx <= m_btnRect.x + m_btnRect.w &&
@@ -114,19 +114,33 @@ void HistogramWindow::handleEvent(const SDL_Event& e) {
         if (!over && m_btnState == BtnState::Hover)  m_btnState = BtnState::Normal;
     }
 
+    // ── Pressionar ───────────────────────────
     if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
         e.button.windowID == myID && e.button.button == SDL_BUTTON_LEFT) {
         float mx = e.button.x, my = e.button.y;
         if (mx >= m_btnRect.x && mx <= m_btnRect.x + m_btnRect.w &&
-            my >= m_btnRect.y && my <= m_btnRect.y + m_btnRect.h)
+            my >= m_btnRect.y && my <= m_btnRect.y + m_btnRect.h) {
             m_btnState = BtnState::Pressed;
+        }
     }
 
+    // ── Soltar — executar ação ────────────────
     if (e.type == SDL_EVENT_MOUSE_BUTTON_UP &&
         e.button.windowID == myID && e.button.button == SDL_BUTTON_LEFT) {
         if (m_btnState == BtnState::Pressed) {
-            // TODO (Membro 4): chamar equalize() ou revertToOriginal()
             m_btnState = BtnState::Normal;
+
+            // Alternar entre equalizar e reverter
+            if (m_data->isEqualized()) {
+                m_data->revertToOriginal();
+                std::cout << "Botao: revertendo para imagem original." << std::endl;
+            } else {
+                m_data->equalize();
+                std::cout << "Botao: equalizando histograma." << std::endl;
+            }
+
+            // Atualizar textura na janela principal
+            refreshHistogram();
         }
     }
 }
@@ -148,7 +162,7 @@ void HistogramWindow::render() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// drawText — helper com alinhamento opcional
+// drawText
 // ─────────────────────────────────────────────────────────────
 void HistogramWindow::drawText(const std::string& text, int x, int y,
                                SDL_Color color) {
@@ -170,84 +184,68 @@ void HistogramWindow::drawText(const std::string& text, int x, int y,
 }
 
 // ─────────────────────────────────────────────────────────────
-// drawHistogram
-//   • Barras proporcionais ao valor máximo (escala linear)
-//   • Linha de média vertical em amarelo
-//   • Grid horizontal em 25 %, 50 %, 75 %
-//   • Rótulos no eixo X: 0, 64, 128, 192, 255
-//   • Título dinâmico: "Histograma" / "Histograma (equalizado)"
+// drawHistogram — barras + grid + linha da média + rótulos eixo X
 // ─────────────────────────────────────────────────────────────
 void HistogramWindow::drawHistogram() {
     const int* hist = m_data->getHistogram();
 
-    // ── Título ──────────────────────────────
-    SDL_Color white  = {220, 220, 225, 255};
+    SDL_Color white = {220, 220, 225, 255};
     std::string title = m_data->isEqualized()
                         ? "Histograma (equalizado)"
                         : "Histograma";
     drawText(title, PADDING, PADDING, white);
 
-    // ── Área de fundo ────────────────────────
     int histW = m_w - 2 * PADDING;
     SDL_FRect bgRect = { (float)PADDING, (float)HIST_TOP,
                          (float)histW,   (float)HIST_HEIGHT };
     SDL_SetRenderDrawColor(m_renderer, 28, 28, 35, 255);
     SDL_RenderFillRect(m_renderer, &bgRect);
 
-    // ── Valor máximo para normalizar ─────────
     int maxVal = 1;
     for (int i = 0; i < 256; i++)
         if (hist[i] > maxVal) maxVal = hist[i];
 
-    // ── Grid horizontal (25 %, 50 %, 75 %) ──
-    SDL_SetRenderDrawColor(m_renderer, 50, 50, 60, 255);
+    // Grid 25/50/75%
+    SDL_SetRenderDrawColor(m_renderer, 50, 50, 62, 255);
     for (int pct : {25, 50, 75}) {
         float gy = HIST_TOP + HIST_HEIGHT * (1.0f - pct / 100.0f);
-        SDL_RenderLine(m_renderer,
-                       PADDING,         (int)gy,
-                       PADDING + histW, (int)gy);
+        SDL_RenderLine(m_renderer, PADDING, (int)gy, PADDING + histW, (int)gy);
     }
 
-    // ── Barras ───────────────────────────────
+    // Barras
     float barW = (float)histW / 256.0f;
     for (int i = 0; i < 256; i++) {
         float barH = ((float)hist[i] / maxVal) * HIST_HEIGHT;
         float bx   = PADDING + i * barW;
         float by   = HIST_TOP + HIST_HEIGHT - barH;
-
-        // Cor: tons de cinza proporcional à intensidade i
         Uint8 shade = (Uint8)i;
         SDL_SetRenderDrawColor(m_renderer, shade, shade, shade, 255);
-
         SDL_FRect bar = { bx, by, std::max(barW, 1.0f), barH };
         SDL_RenderFillRect(m_renderer, &bar);
     }
 
-    // ── Linha da média (amarelo) ─────────────
-    float mean   = m_data->getMeanIntensity();
-    float meanX  = PADDING + (mean / 255.0f) * histW;
+    // Linha da média (amarelo)
+    float mean  = m_data->getMeanIntensity();
+    float meanX = PADDING + (mean / 255.0f) * histW;
     SDL_SetRenderDrawColor(m_renderer, 255, 210, 60, 220);
-    SDL_RenderLine(m_renderer, (int)meanX, HIST_TOP,
-                               (int)meanX, HIST_BOTTOM);
+    SDL_RenderLine(m_renderer, (int)meanX, HIST_TOP, (int)meanX, HIST_BOTTOM);
 
-    // ── Borda da área ────────────────────────
+    // Borda
     SDL_SetRenderDrawColor(m_renderer, 70, 70, 85, 255);
     SDL_RenderRect(m_renderer, &bgRect);
 
-    // ── Rótulos eixo X: 0, 64, 128, 192, 255 ─
+    // Rótulos eixo X
     SDL_Color axisColor = {120, 120, 135, 255};
     const int ticks[] = {0, 64, 128, 192, 255};
     for (int t : ticks) {
         float tx = PADDING + (t / 255.0f) * histW;
         char buf[8];
         snprintf(buf, sizeof(buf), "%d", t);
-        // Centralizar rótulo sobre o tick
-        int labelOffset = (t == 0) ? 0 : (t == 255) ? -16 : -8;
-        drawText(buf, (int)tx + labelOffset,
-                 HIST_BOTTOM + 4, axisColor);
+        int off = (t == 0) ? 0 : (t == 255) ? -16 : -8;
+        drawText(buf, (int)tx + off, HIST_BOTTOM + 4, axisColor);
     }
 
-    // ── Legenda da linha amarela ──────────────
+    // Legenda da média
     SDL_Color yellow = {255, 210, 60, 255};
     char meanBuf[32];
     snprintf(meanBuf, sizeof(meanBuf), "media: %.1f", mean);
@@ -255,62 +253,37 @@ void HistogramWindow::drawHistogram() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// drawAnalysisInfo
-//   • Classificação de brilho (clara / média / escura) com badge colorido
-//   • Classificação de contraste (alto / médio / baixo) com badge colorido
-//   • Origem da imagem (colorida convertida ou já cinza)
-//   • Linha divisória acima da seção
+// drawAnalysisInfo — classificação de brilho, contraste e estado
 // ─────────────────────────────────────────────────────────────
 void HistogramWindow::drawAnalysisInfo() {
     float mean   = m_data->getMeanIntensity();
     float stddev = m_data->getStdDeviation();
 
-    // ── Classificação de brilho ──────────────
-    // Limites: média < 85 → escura; 85–170 → média; > 170 → clara
     std::string brightness;
     SDL_Color   brightColor;
-    if (mean > 170.f) {
-        brightness   = "Clara";
-        brightColor  = {100, 220, 120, 255};  // verde
-    } else if (mean > 85.f) {
-        brightness   = "Media";
-        brightColor  = {220, 190, 80,  255};  // amarelo
-    } else {
-        brightness   = "Escura";
-        brightColor  = {180,  80,  80, 255};  // vermelho
-    }
+    if (mean > 170.f)      { brightness = "Clara";  brightColor = {100, 220, 120, 255}; }
+    else if (mean > 85.f)  { brightness = "Media";  brightColor = {220, 190,  80, 255}; }
+    else                   { brightness = "Escura"; brightColor = {180,  80,  80, 255}; }
 
-    // ── Classificação de contraste ───────────
-    // Limites: desvio < 30 → baixo; 30–60 → médio; > 60 → alto
     std::string contrast;
     SDL_Color   contrastColor;
-    if (stddev > 60.f) {
-        contrast      = "Alto";
-        contrastColor = {100, 190, 255, 255}; // azul
-    } else if (stddev > 30.f) {
-        contrast      = "Medio";
-        contrastColor = {220, 190, 80,  255}; // amarelo
-    } else {
-        contrast      = "Baixo";
-        contrastColor = {180,  80,  80, 255}; // vermelho
-    }
+    if (stddev > 60.f)     { contrast = "Alto";  contrastColor = {100, 190, 255, 255}; }
+    else if (stddev > 30.f){ contrast = "Medio"; contrastColor = {220, 190,  80, 255}; }
+    else                   { contrast = "Baixo"; contrastColor = {180,  80,  80, 255}; }
 
-    // ── Linha divisória ──────────────────────
     SDL_SetRenderDrawColor(m_renderer, 55, 55, 68, 255);
-    SDL_RenderLine(m_renderer, PADDING, DIVIDER_Y,
-                   m_w - PADDING, DIVIDER_Y);
+    SDL_RenderLine(m_renderer, PADDING, DIVIDER_Y, m_w - PADDING, DIVIDER_Y);
 
     SDL_Color sectionTitle = {180, 180, 195, 255};
     SDL_Color labelColor   = {140, 140, 155, 255};
     SDL_Color valueColor   = {220, 220, 232, 255};
 
     int y = INFO_TOP;
-
     drawText("Analise da imagem", PADDING, y, sectionTitle);
     y += LINE_H + 4;
 
-    // ── Brilho ───────────────────────────────
     char buf[64];
+
     drawText("Brilho (media):", PADDING, y, labelColor);
     snprintf(buf, sizeof(buf), "%.1f", mean);
     drawText(buf, PADDING + 115, y, valueColor);
@@ -318,7 +291,6 @@ void HistogramWindow::drawAnalysisInfo() {
     drawText(brightness, PADDING + 185, y, brightColor);
     y += LINE_H;
 
-    // ── Contraste ────────────────────────────
     drawText("Contraste (dp):", PADDING, y, labelColor);
     snprintf(buf, sizeof(buf), "%.1f", stddev);
     drawText(buf, PADDING + 115, y, valueColor);
@@ -326,7 +298,6 @@ void HistogramWindow::drawAnalysisInfo() {
     drawText(contrast, PADDING + 185, y, contrastColor);
     y += LINE_H;
 
-    // ── Origem ───────────────────────────────
     SDL_Color originColor = {110, 110, 125, 255};
     std::string origin = m_data->isGrayscale()
                          ? "Origem: cinza (sem conversao)"
@@ -334,7 +305,6 @@ void HistogramWindow::drawAnalysisInfo() {
     drawText(origin, PADDING, y, originColor);
     y += LINE_H;
 
-    // ── Estado atual ─────────────────────────
     std::string state = m_data->isEqualized()
                         ? "Estado: equalizada"
                         : "Estado: escala de cinza original";
@@ -345,27 +315,29 @@ void HistogramWindow::drawAnalysisInfo() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// drawButton
+// drawButton — botão com 3 estados de cor + texto dinâmico
 // ─────────────────────────────────────────────────────────────
 void HistogramWindow::drawButton() {
+    // Cor de fundo conforme estado
     SDL_Color bg;
     switch (m_btnState) {
-        case BtnState::Hover:   bg = {100, 160, 240, 255}; break;
-        case BtnState::Pressed: bg = { 30,  80, 160, 255}; break;
-        default:                bg = { 60, 120, 210, 255}; break;
+        case BtnState::Hover:   bg = {100, 160, 240, 255}; break; // azul claro
+        case BtnState::Pressed: bg = { 30,  80, 160, 255}; break; // azul escuro
+        default:                bg = { 60, 120, 210, 255}; break; // azul neutro
     }
 
+    // Fundo
     SDL_SetRenderDrawColor(m_renderer, bg.r, bg.g, bg.b, bg.a);
     SDL_RenderFillRect(m_renderer, &m_btnRect);
 
+    // Borda
     SDL_SetRenderDrawColor(m_renderer, 40, 90, 170, 255);
     SDL_RenderRect(m_renderer, &m_btnRect);
 
+    // Texto dinâmico: "Equalizar" ou "Ver original"
     std::string label = m_data->isEqualized() ? "Ver original" : "Equalizar";
-    SDL_Color textColor = {255, 255, 255, 255};
-
     int textW = (int)label.size() * 7;
-    int tx = (int)(m_btnRect.x + (m_btnRect.w - textW) / 2);
-    int ty = (int)(m_btnRect.y + (m_btnRect.h - 13) / 2);
-    drawText(label, tx, ty, textColor);
+    int tx    = (int)(m_btnRect.x + (m_btnRect.w - textW) / 2);
+    int ty    = (int)(m_btnRect.y + (m_btnRect.h - 13) / 2);
+    drawText(label, tx, ty, {255, 255, 255, 255});
 }
