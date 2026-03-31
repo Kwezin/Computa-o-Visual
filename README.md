@@ -7,8 +7,8 @@
 
 ## Integrantes
 
-| Nome | RA | Responsabilidade principal |
-|------|----|---------------------------|
+| Nome | RA |
+|------|----|
 | [Kaue Henrque Matias Aves] | 10417894 |
 | [Diego Spagnuolo Sugai] | 10417329 |
 
