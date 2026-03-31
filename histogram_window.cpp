@@ -48,7 +48,7 @@ HistogramWindow::~HistogramWindow() {
 // ─────────────────────────────────────────────────────────────
 bool HistogramWindow::init() {
     m_window = SDL_CreateWindow("Histograma", m_w, m_h,
-                                SDL_WINDOW_UTILITY | SDL_WINDOW_NOT_RESIZABLE);
+                                SDL_WINDOW_UTILITY);
     if (!m_window) {
         std::cerr << "HistogramWindow: SDL_CreateWindow falhou: "
                   << SDL_GetError() << std::endl;
