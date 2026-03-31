@@ -4,8 +4,7 @@
 #include <SDL3_image/SDL_image.h>
 #include <string>
 
-// Forward declaration — outras partes do projeto vão implementar esses módulos
-struct ImageData;
+class ImageData;
 class HistogramWindow;
 
 class App {
@@ -17,7 +16,7 @@ public:
     void run();
     void shutdown();
 
-    // Chamado pelo Membro 4 para atualizar a textura exibida
+    // Chamado pela HistogramWindow (Membro 4) para trocar a textura exibida
     void updateMainTexture(SDL_Surface* surface);
 
     SDL_Window*   getMainWindow()   const { return m_mainWindow; }
@@ -28,18 +27,14 @@ private:
     void render();
     void saveImage();
 
-    SDL_Window*    m_mainWindow    = nullptr;
-    SDL_Renderer*  m_mainRenderer  = nullptr;
-    SDL_Texture*   m_mainTexture   = nullptr;
+    SDL_Window*      m_mainWindow   = nullptr;
+    SDL_Renderer*    m_mainRenderer = nullptr;
+    SDL_Texture*     m_mainTexture  = nullptr;
+    HistogramWindow* m_histWindow   = nullptr;
+    ImageData*       m_imageData    = nullptr;
 
-    // Janela secundária — instanciada pelo Membro 2
-    HistogramWindow* m_histWindow  = nullptr;
-
-    // Dados da imagem — preenchidos pelo Membro 2
-    ImageData*     m_imageData     = nullptr;
-
-    std::string    m_imagePath;
-    bool           m_running       = false;
-    int            m_imgW          = 0;
-    int            m_imgH          = 0;
+    std::string m_imagePath;
+    bool        m_running = false;
+    int         m_imgW    = 0;
+    int         m_imgH    = 0;
 };
