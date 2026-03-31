@@ -135,6 +135,5 @@ void App::shutdown() {
     if (m_mainTexture)  { SDL_DestroyTexture(m_mainTexture);   m_mainTexture  = nullptr; }
     if (m_mainRenderer) { SDL_DestroyRenderer(m_mainRenderer); m_mainRenderer = nullptr; }
     if (m_mainWindow)   { SDL_DestroyWindow(m_mainWindow);     m_mainWindow   = nullptr; }
-    IMG_Quit();
     SDL_Quit();
 }
