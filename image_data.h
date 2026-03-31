@@ -5,10 +5,8 @@
 /*
  * ImageData
  * ──────────────────────────────────────────────────────────────
- * Membro 1 — criou o header com a interface
- * Membro 2 — implementou detecção/conversão cinza + cálculo básico
- * Membro 3 — refinou cálculo de estatísticas e adicionou recalcStats()
- * Membro 4 — implementará equalize() e revertToOriginal()
+ * Kauê Henrique Matias Alves
+ * Diego Spagnuolo Sugai
  * ──────────────────────────────────────────────────────────────
  */
 class ImageData {
