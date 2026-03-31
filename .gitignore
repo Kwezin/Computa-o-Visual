@@ -1,0 +1,19 @@
+# Compilados
+*.o
+*.d
+programa
+
+# Saída
+output_image.png
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
