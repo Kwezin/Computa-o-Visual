@@ -9,7 +9,7 @@
 
 | Nome | RA |
 |------|----|
-| [Kaue Henrque Matias Aves] | 10417894 |
+| [Kaue Henrique Matias Alves] | 10417894 |
 | [Diego Spagnuolo Sugai] | 10417329 |
 
 ---
@@ -103,7 +103,7 @@ proj1/
 
 ## Contribuições
 
-- **[Nome 1]:** `main.cpp`, `app.h/cpp`, `image_loader.h/cpp`, `Makefile`, `.gitignore`, `README.md`
-- **[Nome 2]:** Lógica de detecção/conversão em `image_data.cpp`, criação da janela secundária em `histogram_window.cpp`
-- **[Nome 3]:** Cálculo do histograma, média, desvio padrão e exibição gráfica em `histogram_window.cpp`
-- **[Nome 4]:** Algoritmo de equalização em `image_data.cpp`, botão interativo em `histogram_window.cpp`
+- **[Kaue Henrque Matias Aves]:** `main.cpp`, `app.h/cpp`, `image_loader.h/cpp`, `Makefile`, `.gitignore`, `README.md`
+- **[Diego Spagnuolo Sugai]:** Lógica de detecção/conversão em `image_data.cpp`, criação da janela secundária em `histogram_window.cpp`
+- **[Kaue Henrque Matias Aves]:** Cálculo do histograma, média, desvio padrão e exibição gráfica em `histogram_window.cpp`
+- **[Diego Spagnuolo Sugai]:** Algoritmo de equalização em `image_data.cpp`, botão interativo em `histogram_window.cpp`
