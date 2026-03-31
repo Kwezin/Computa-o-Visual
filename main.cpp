@@ -3,10 +3,8 @@
  * Universidade Presbiteriana Mackenzie - Computação Visual
  *
  * Integrantes:
- *   - [Nome 1] - RA: [XXXXXXX]
- *   - [Nome 2] - RA: [XXXXXXX]
- *   - [Nome 3] - RA: [XXXXXXX]
- *   - [Nome 4] - RA: [XXXXXXX]
+ *   - [Kauê Henrique Matias Alves] - RA: [10417894]
+ *   - [Diego Spagnuolo Sugai] - RA: [10417329]
  */
 
 #include "app.h"
