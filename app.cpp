@@ -58,13 +58,13 @@ bool App::init(const std::string& imagePath) {
         return false;
     }
 
-    // Membro 4: passar "this" para que HistogramWindow possa chamar updateMainTexture()
+    // passar "this" para que HistogramWindow possa chamar updateMainTexture()
     m_histWindow = new HistogramWindow(
         m_mainWindow,
         winX + m_imgW + WIN_GAP, winY,
         SECONDARY_WIN_W, SECONDARY_WIN_H,
         m_imageData,
-        this          // <── novo parâmetro adicionado pelo Membro 4
+        this          // <── novo parâmetro adicionado
     );
     if (!m_histWindow->init()) {
         std::cerr << "Falha ao criar janela secundaria." << std::endl;
