@@ -65,7 +65,7 @@ bool HistogramWindow::init() {
         return false;
     }
 
-    if (!TTF_Init()) {
+    if (TTF_Init() < 0) {
         std::cerr << "TTF_Init falhou: " << SDL_GetError() << std::endl;
         return false;
     }
