@@ -93,7 +93,9 @@ void App::handleEvents() {
                 m_running = false;
                 break;
             case SDL_EVENT_KEY_DOWN:
-                if (e.key.key == SDLK_S) saveImage();
+                if (e.key.keysym.sym == SDLK_s) {
+                    saveImage();
+                }
                 break;
             default:
                 if (m_histWindow) m_histWindow->handleEvent(e);
