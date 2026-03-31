@@ -74,10 +74,10 @@ brew install sdl3 sdl3_image sdl3_ttf
 make
 
 # Executar com uma imagem
-./programa teste_image.jpeg
+./programa image_test.png
 
 # Ou usando o atalho do Makefile
-make run teste_image.jpeg
+make run image_test.png
 
 # Limpar arquivos compilados
 make clean
@@ -86,7 +86,7 @@ OU Apenas
 
 g++ *.cpp -o programa.exe -lSDL3 -lSDL3_image -lSDL3_ttf
 
-./programa.exe teste_image.jpeg
+./programa.exe image_test.png
 
 ```
 
