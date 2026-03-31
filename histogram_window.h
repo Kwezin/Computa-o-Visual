@@ -10,10 +10,8 @@ class App;
 /*
  * HistogramWindow — janela secundária (filha da principal)
  *
- * Membro 1 — criou os stubs
- * Membro 2 — criou a janela e o layout base
- * Membro 3 — refinou histograma e análise estatística
- * Membro 4 — conectou o botão à equalização e ao App
+ * Kauê Henrique Matias Alves
+ * Diego Spagnuolo Sugai
  */
 class HistogramWindow {
 public:
