@@ -93,7 +93,8 @@ void App::handleEvents() {
                 m_running = false;
                 break;
             case SDL_EVENT_KEY_DOWN:
-                if (e.key.key == SDLK_S) {
+                if (e.key.key == 's' || e.key.key == 'S') {
+                    std::cout << "Salvando imagem..." << std::endl;
                     saveImage();
                 }
                 break;
