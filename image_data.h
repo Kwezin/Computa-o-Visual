@@ -14,11 +14,9 @@ public:
     explicit ImageData(SDL_Surface* rawSurface);
     ~ImageData();
 
-    // ── Membro 2 ─────────────────────────────
     bool           isGrayscale()         const;
     SDL_Surface*   getGrayscaleSurface() const;
 
-    // ── Membro 3 ─────────────────────────────
     // histogram[i] = número de pixels com intensidade i (0..255)
     // Reflete sempre a imagem ATUAL (cinza ou equalizada)
     const int*     getHistogram()        const;
@@ -26,10 +24,9 @@ public:
     float          getStdDeviation()     const;
 
     // Recalcula histograma/média/desvio da superfície atual.
-    // O Membro 4 deve chamar isso após equalize() e revertToOriginal().
+    // chamar isso após equalize() e revertToOriginal().
     void           recalcStats();
 
-    // ── Membro 4 ─────────────────────────────
     SDL_Surface*   getEqualizedSurface() const;
     bool           isEqualized()         const;
     void           equalize();
