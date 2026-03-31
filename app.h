@@ -16,7 +16,7 @@ public:
     void run();
     void shutdown();
 
-    // Chamado pela HistogramWindow (Membro 4) para trocar a textura exibida
+    // Chamado pela HistogramWindow para trocar a textura exibida
     void updateMainTexture(SDL_Surface* surface);
 
     SDL_Window*   getMainWindow()   const { return m_mainWindow; }
