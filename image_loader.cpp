@@ -11,9 +11,10 @@ SDL_Surface* ImageLoader::load(const std::string& path) {
 
     // ── 2. Inicializar SDL_image ──────────────
     // IMG_Init retorna as flags que foram inicializadas com sucesso
-    int flags = IMG_INIT_PNG | IMG_INIT_JPG;
-    if ((IMG_Init(flags) & flags) != flags) {
-        std::cerr << "IMG_Init falhou: " << SDL_GetError() << std::endl;
+    SDL_Surface* surface = IMG_Load(path.c_str());
+    if (!surface) {
+        std::cerr << "Erro ao carregar imagem '" << path << "': "
+                  << SDL_GetError() << std::endl;
         return nullptr;
     }
 
