@@ -3,8 +3,7 @@
 #include "image_data.h"
 #include "histogram_window.h"
 #include <iostream>
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_image.h>
+
 
 static constexpr int SECONDARY_WIN_W = 360;
 static constexpr int SECONDARY_WIN_H = 480;
