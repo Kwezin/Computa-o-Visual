@@ -5,27 +5,25 @@
 #include <string>
 
 class ImageData;
+class App;
 
 /*
- * HistogramWindow
- * Janela secundária (filha da principal). Tamanho fixo.
- * Exibe: histograma | análise estatística | botão equalizar
+ * HistogramWindow — janela secundária (filha da principal)
  *
- * Implementação dividida:
- *   Membro 2 — criação da janela, layout, drawHistogram() base, drawButton()
- *   Membro 3 — refina drawHistogram() e drawAnalysisInfo()
- *   Membro 4 — conecta handleEvent() à lógica de equalização
+ * Membro 1 — criou os stubs
+ * Membro 2 — criou a janela e o layout base
+ * Membro 3 — refinou histograma e análise estatística
+ * Membro 4 — conectou o botão à equalização e ao App
  */
 class HistogramWindow {
 public:
-    HistogramWindow(SDL_Window* parent, int x, int y, int w, int h, ImageData* data);
+    HistogramWindow(SDL_Window* parent, int x, int y, int w, int h,
+                    ImageData* data, App* app);
     ~HistogramWindow();
 
     bool init();
     void handleEvent(const SDL_Event& e);
     void render();
-
-    // Membro 4 chama isso depois de equalizar para atualizar o histograma exibido
     void refreshHistogram();
 
 private:
@@ -38,6 +36,7 @@ private:
     SDL_Renderer* m_renderer = nullptr;
     TTF_Font*     m_font     = nullptr;
     ImageData*    m_data     = nullptr;
+    App*          m_app      = nullptr;   // para notificar troca de textura
     SDL_Window*   m_parent   = nullptr;
 
     int m_x, m_y, m_w, m_h;
