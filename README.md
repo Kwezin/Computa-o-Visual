@@ -81,13 +81,14 @@ make run teste_image.jpeg
 
 # Limpar arquivos compilados
 make clean
-```
-OU
+
+OU Apenas
 
 g++ *.cpp -o programa.exe -lSDL3 -lSDL3_image -lSDL3_ttf
 
 ./programa.exe teste_image.jpeg
 
+```
 
 ---
 
