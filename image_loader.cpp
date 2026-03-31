@@ -1,8 +1,7 @@
 #include "image_loader.h"
 #include <iostream>
 #include <filesystem>
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_image.h>
+
 
 SDL_Surface* ImageLoader::load(const std::string& path) {
     // ── 1. Verificar se o arquivo existe ─────
