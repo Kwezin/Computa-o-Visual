@@ -9,10 +9,8 @@
 
 | Nome | RA | Responsabilidade principal |
 |------|----|---------------------------|
-| [Kaue Henrque Matias Aves] | 10417894 | Estrutura base, carregamento de imagem, janela principal, salvar imagem |
-| [Nome 2] | XXXXXXX | Detecção/conversão escala de cinza, janela secundária |
-| [Nome 3] | XXXXXXX | Cálculo e exibição do histograma, análise estatística |
-| [Nome 4] | XXXXXXX | Equalização do histograma, botão interativo |
+| [Kaue Henrque Matias Aves] | 10417894 |
+| [Diego Spagnuolo Sugai] | 10417329 |
 
 ---
 
